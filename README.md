@@ -62,8 +62,8 @@ The setpoints received from the mqtt broker are under the `truma/set` topic and 
 |truma/set/simultemp|from -273.0 to 30.0|used to simulate the room temperature, set it to -273.0 to use the real temperature|
 |truma/set/temp|from 0.0 to 30.0|room temperature setpoint, use 0.0 to turn off the heating, 5.0 or more to turn it on|
 |truma/set/boiler|off, eco, high or boost|hot water setting|
-|truma/set/fan|off, eco, high or from 0 to 10|use 0 to 10 for ventilation (heating must be off), with the heating on 1 and 2 are equivalent to eco/high|
-|truma/set/reset|1|use it to request an error reset, be sure to make it not remanent|
+|truma/set/fan|off, eco, high or from 0 to 10|use 1 to 10 for ventilation (heating must be off), with the heating on 2 is equivalent to "high" and any other value (including "off") is equivalent to "eco"|
+|truma/set/reset|1|use it to request an error reset, be sure to make it not retaining|
 
 ## mqtt status
 
