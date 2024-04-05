@@ -1,0 +1,276 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.settings-table {
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.settings-table td {
+  border: none;
+  max-width: 1%;
+  white-space: nowrap;
+}
+
+.settings-table label {
+  /* margin-right: 10px;*/
+  font-weight: bold;
+  color: #555;
+  font-size: 1.2em;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+.select,
+input[type="number"] {
+  /* flex: 3; */
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  font-size: 1.5em;
+}
+
+
+.temperature-control {
+  width: 80px;
+}
+
+span {
+  font-size: 1.2em;
+}
+
+input[type="checkbox"] {
+  margin-left: 10px;
+  transform: scale(1.5);
+}
+
+.status {
+  font-size: 2em;
+}
+
+.status td {
+  width: 33%;
+}
+
+.status-line {
+  text-align: center;
+}
+
+.reset_msg {
+  color: #ff5555;
+}
+
+.reset_button {
+  background-color: #f44336;
+  font-size: 1.5em;
+  color: white;
+  border-radius: 5px;
+  padding: 5px;
+}
+  /* Additional CSS for tab styles */
+  .tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+  }
+
+  /* Style the buttons inside the tab */
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+  }
+
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #ddd;
+  }
+
+  /* Create an active/current tablink class */
+  .tab button.active {
+    background-color: #ccc;
+  }
+
+  /* Style the tab content */
+  .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+  }
+
+  .tabcontent.active {
+    display: block;
+  }
+
+  /* Additional CSS for table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .status-table td {
+    border-top: none;
+    width: 33%;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    left: -100vw;
+ }
+
+ .room-demand::after {
+  content: "🔥";
+  font-size: 20px;
+}
+#roomdemand:not(:checked) ~ .room-demand::after {
+  content: "🔥";
+  font-size: 20px;
+  color: transparent;
+  text-shadow: 0 0 0 #d0d0d0;
+}
+.water-demand::after {
+  content: "🔥";
+  font-size: 20px;
+}
+
+#waterdemand:not(:checked) ~ .water-demand::after {
+  content: "🔥";
+  font-size: 20px;
+  color: transparent;
+  text-shadow: 0 0 0 #d0d0d0;
+}
+
+.window::after {
+  content: "closed";
+  font-size: 20px;
+}
+
+#window:not(:checked) ~ .window::after {
+  content: "open";
+  font-size: 20px;
+  color: red;
+}
+
+input[type="number"] {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+
+.number-input {
+ /* border: 0; */
+  display: inline-flex;
+}
+
+.number-input,
+.number-input * {
+  box-sizing: border-box;
+}
+
+.number-input button {
+  outline:none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  cursor: pointer;
+  margin: 0;
+  position: relative;
+  box-shadow: 0px 0px 1px #474747;
+  border-radius: 8px;
+}
+
+.number-input button:before,
+.number-input button:after {
+  display: inline-block;
+  position: absolute;
+  content: '';
+  width: 1rem;
+  height: 2px;
+  background-color: #212121;
+  transform: translate(-50%, -50%);
+}
+.number-input button.plus:after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.number-input input[type=number] {
+  max-width: 5rem;
+  padding: .5rem;
+  font-size: 1.5rem;
+  height: 3rem;
+  text-align: center;
+}
+
+.vert-center {
+  align-items: center;
+  display: flex;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  color: red;
+  font-size: 1.5em;
+  text-align: center;
+}}

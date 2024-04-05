@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combi D</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <!-- <h1>Combi D</h1> -->
+
+  <!-- Tabs -->
+  <div class="tab">
+    <button class="tablinks active" onclick="openTab(event, 'Controls')">Controls</button>
+    <button class="tablinks" onclick="openTab(event, 'Details')">Details</button>
+  </div>
+
+  <!-- Controls Tab -->
+  <div id="Controls" class="tabcontent active">
+
+    <table class="settings-table">
+      <tr>
+        <td>  
+        <label for="temp">Heating:</label>
+        </td>
+        <td class="vert-center">
+          <span class="number-input">
+            <button onclick="changeTemp(-0.1)" ></button>
+            <input class="quantity" min="5.0" max="30.0" step="0.1" name="temp" id="temp" value="5.0" type="number">
+            <button onclick="changeTemp(0.1)" class="plus"></button>
+          </span>
+        <span style="margin-left: 5px; font-size: 1.5em;">°C</span>
+        <input type="checkbox" id="temperature-on"><label for="temperature-on" style="margin-left: 5px;"> On</label>
+        </td>
+      </tr>
+      <tr>
+        <td>    
+        <label for="boiler">Water:</label>
+        </td>
+        <td>
+        <select id="boiler" class="select">
+          <option value="off">Off</option>
+          <option value="eco">Eco</option>
+          <option value="high">High</option>
+          <option value="boost">Boost</option>
+        </select>
+        <label for="fan">Fan:</label>
+        <select id="fan" class="select">
+          <option value="off">Off</option>
+          <option value="eco">Eco</option>
+          <option value="high">High</option>
+          <optgroup label="Speed">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </optgroup>
+        </select>
+      </td>
+      </tr>
+      </table>
+
+  <table>
+      <tr> 
+      <td>Room Temperature</td>
+      <td>Water Temperature</td>
+      <td>Voltage</td>
+      </tr>
+    <tr class="status"> 
+       <td><span id="room_temp">--</span> °C</td>
+       <td><span id="water_temp">--</span> °C</td> 
+       <td><span id="voltage">--</span> V</td> 
+       </tr> 
+  </table>
+  <table class="status-table">
+    <tr>
+    <td><input type="checkbox" id="roomdemand" class="visually-hidden"><span class="room-demand">Heating </span></td>
+    <td><input type="checkbox" id="waterdemand" class="visually-hidden"><span class="water-demand">Boiler </span></td>
+    <td><input type="checkbox" id="window" class="visually-hidden"><span class="window">Window </span></td>
+    </tr>
+  </table>    
+  <div class="status-line">
+    <p><span id="error_class"></span> <span id="error_code"></span> <button id="error_reset_button" class="reset_button" style="visibility: hidden;">Reset</button></p>
+  </div>
+  <div class="status-line">
+    <p><span id="waterboost_msg"></span></p>
+  </div>
+    </div>
+
+  <!-- Details Tab -->
+  <div id="Details" class="tabcontent">
+    <table id="detailsTable">
+      <tr>
+        <th>Item</th>
+        <th>Value</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+     <p id="modal-text"></p>
+  </div>
+</div> 
+
+<script src="reconnecting-websocket.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
