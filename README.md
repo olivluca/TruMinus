@@ -113,5 +113,5 @@ Only one error condition can be shown at a time.
 ## display
 
 The companion repository
-(TrumaDisplay)[https://github.com/olivluca/TrumaDisplay] implements a simple
+[TrumaDisplay](https://github.com/olivluca/TrumaDisplay) implements a simple
 display using the topics made available by this project.
