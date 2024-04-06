@@ -109,3 +109,9 @@ Only one error condition can be shown at a time.
 |2|no mqtt connection|
 |3|lin bus error|
 |4|performing error reset|
+
+## display
+
+The companion repository
+(TrumaDisplay)[https://github.com/olivluca/TrumaDisplay] implements a simple
+display using the topics made available by this project.
