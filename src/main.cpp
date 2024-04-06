@@ -496,6 +496,11 @@ void handleSetting(const String& topic, const String& payload, boolean local)  {
       HandleCommandReset();
       return;
     }   
+    //refresh request
+    if (topic=="truma/set/refresh") {
+      doforcesend=true;
+      return;
+    }
     //otherwise pass it on to each mqtt setting
     for (int i=0;i<SETPOINTS;i++) {
       if (MqttSetpoint[i]->MqttMessage(topic, payload,local)) 
