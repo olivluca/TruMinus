@@ -341,12 +341,25 @@ bool TMasterFrame::CheckReply()
     return freply[2]==fsid+64;
 }
 
+uint8_t getProtectedID(uint8_t FrameID)
+{
+    // calc Parity Bit 0
+    uint8_t p0 = bitRead(FrameID, 0) ^ bitRead(FrameID, 1) ^ bitRead(FrameID, 2) ^ bitRead(FrameID, 4);
+    // calc Parity Bit 1
+    uint8_t p1 = ~(bitRead(FrameID, 1) ^ bitRead(FrameID, 3) ^ bitRead(FrameID, 4) ^ bitRead(FrameID, 5));
+    // combine bits to protected ID
+    // 0..5 id is limited between 0x00..0x3F
+    // 6    parity bit 0
+    // 7    parity bit 1
+    return ((p1 << 7) | (p0 << 6) | (FrameID & 0x3F));
+}
+
 TAssignFrameRanges::TAssignFrameRanges(uint8_t startindex, std::array<uint8_t,4> frames)
   :TMasterFrame(0x01, 0x06, 0xb7) 
 {
     fdata[3]=startindex;
     for (int i=0; i<4; i++) {
-        fdata[i+4]=frames[i];
+        fdata[i+4]=getProtectedID(frames[i]);
     }
 }
 
