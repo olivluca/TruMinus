@@ -370,18 +370,22 @@ void loop() {
       if (LinBus.readFrame(frames_to_read[i]->frameid(),8)) {
         frames_to_read[i]->setReadResult(true);
         frames_to_read[i]->setData((uint8_t*)&(LinBus.LinMessage));
-        //if frame 3b can be read it is no longer necessary to assign frame ranges
-        if (frames_to_read[i]->frameid()==0x3b) {
-          AssignFrameRanges(false);
-        }
       } else {
         frames_to_read[i]->setReadResult(false);
-        //if frame 3b cannot be read, assign frame ranges
-        if (frames_to_read[i]->frameid()==0x3b) {
-          AssignFrameRanges(true);
-        }
       }
     }
+
+    //if all the extra frames can be read successfully, there is no need to send
+    //the master frames to assign frame ranges
+    boolean extraFramesOk=true;
+    for (int i=2; i<FRAMES_TO_READ; i++) {
+       if (!frames_to_read[i]->getDataOk()) {
+          extraFramesOk=false;
+          break;
+       }
+    }
+    AssignFrameRanges(!extraFramesOk);
+
     //for the time being frame 16 is used to check the lin bus communication
     //(perhaps some more frames should be taken into account)
     trumaok=Frame16->getDataOk();
