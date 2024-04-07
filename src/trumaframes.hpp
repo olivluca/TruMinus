@@ -174,7 +174,7 @@ class TFrameBase {
 double RawKelvinToTemp(const uint16_t RawValue);
 void TempToRawKelvin(double temp, uint8_t *dest);
 double RawToVoltage(const uint16_t RawValue);
-double RawToFlameTemperature(const int8_t RawValue);
+double RawToFlameTemperature(const uint8_t RawValue);
 
 
 /* publishes a temperature in ºC*/
@@ -266,7 +266,7 @@ public:
 class TPubFlameTemperature: public TMqttPublisherBase {
   protected:
   virtual String getPayload() override {
-    return String(RawToFlameTemperature(fvalue),1);
+    return String(RawToFlameTemperature(fvalue),0);
   }
 public:
   TPubFlameTemperature(String topic) : TMqttPublisherBase(topic) {}  
@@ -276,7 +276,8 @@ public:
 class TPubPumpFrequency: public TMqttPublisherBase {
   protected:
   virtual String getPayload() override {
-    return String(fvalue/25,1);
+    double freq=fvalue/25.0;
+    return String(freq,2);
   }
 public:
   TPubPumpFrequency(String topic) : TMqttPublisherBase(topic) {}  

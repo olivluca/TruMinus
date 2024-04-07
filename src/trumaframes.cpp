@@ -18,9 +18,10 @@ double RawToVoltage(const uint16_t RawValue)
     return RawValue/ 100.0 -327.67;
 }
 
-double RawToFlameTemperature(const int8_t RawValue)
+double RawToFlameTemperature(const uint8_t RawValue)
 {
-    return pow(RawValue,3.0)* 1.8602209820528515E-05 + pow(RawValue, 2.0) * -0.0004895309102721512 + RawValue * 1.4470709562301636 -65.64685821533203;
+    double v=RawValue; 
+    return pow(v,3.0)* 1.8602209820528515E-05 + pow(v, 2.0) * -0.0004895309102721512 + v * 1.4470709562301636 -65.64685821533203;
 };
 
 TMqttPublisherBase::TMqttPublisherBase(String topic)
