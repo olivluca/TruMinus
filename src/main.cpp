@@ -93,6 +93,8 @@ TCommandReader CommandReader;
 TPubBool PublishReset("/reset");
 //publish to the mqtt broker/websocket client that the lin bus comm is ok
 TPubBool PublishLinOk("/linok");
+//heartbeat (for the mqtt clients to detect this program is working)
+TPubBool PublishHeartBeat("/heartbeat");
 
 //start an error reset
 void HandleCommandReset();
@@ -363,6 +365,7 @@ void loop() {
       }
       PublishLinOk.setForcesend();
       PublishReset.setForcesend();
+      PublishHeartBeat.setForcesend();
       doforcesend=false;
     }
     //read all the frames
@@ -416,6 +419,8 @@ void loop() {
   //report the status of the reset and the lin bus communication
   PublishReset.setValue(truma_reset);
   PublishLinOk.setValue(trumaok);
+  //and the heartbeat
+  PublishHeartBeat.setValue(true);
 
  /*
   Serial.print(ESP.getFreeHeap());
