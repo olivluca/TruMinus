@@ -88,12 +88,15 @@
     </tr>
   </table>    
   <div class="status-line">
-    <p><span id="error_class"></span> <span id="error_code"></span> <button id="error_reset_button" class="reset_button" style="visibility: hidden;">Reset</button></p>
+    <p><span id="error_class" class="error"></span> <span id="error_code" class="error"></span> <button id="error_reset_button" class="reset_button" style="visibility: hidden;">Reset</button></p>
+  </div>
+  <div class="status-line">
+    <p><span id="error_msg" class="error"></span></p>
   </div>
   <div class="status-line">
     <p><span id="waterboost_msg"></span></p>
   </div>
-    </div>
+  </div>
 
   <!-- Details Tab -->
   <div id="Details" class="tabcontent">
@@ -113,6 +116,7 @@
 </div> 
 
 <script src="reconnecting-websocket.min.js"></script>
+<script src="errors.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

@@ -136,10 +136,18 @@ function ShowResetButton() {
           ShowResetButton();
         }
         if (name=="err_code") {
-            if (parseInt(value)==0) {
+            code=parseInt(value);
+            if (code==0) {
                 document.getElementById("error_code").textContent="";
+                document.getElementById("error_msg").textContent="";
             } else {
                 document.getElementById("error_code").textContent=value;
+                msg=ErrText[code];
+                if (msg) {
+                    document.getElementById("error_msg").textContent=msg;
+                } else {
+                    document.getElementById("error_msg").textContent="unknown error code";
+                }
             }
         }
         if (name=="waterboost") {
