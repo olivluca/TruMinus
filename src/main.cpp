@@ -38,7 +38,7 @@ Lin_Interface LinBus(1);
 TWaterBoost *WaterBoost;
 
 //the frames to be read
-#define FRAMES_TO_READ 7
+#define FRAMES_TO_READ 5
 TFrameBase * frames_to_read[FRAMES_TO_READ];
  //I only care about frame 16 content, the remaining frames will be 
  //directly allocated in frames_to_read
@@ -129,14 +129,14 @@ void setup() {
   pinMode(LED,OUTPUT); 
 
   //frames to read
+  //frames 0x14 and 0x37 are defined but are useless for this model of combi D
+  //so they're not read
   Frame16=new TFrame16();
   frames_to_read[0] = Frame16;
-  frames_to_read[1] = new TFrame14();
-  frames_to_read[2] = new TFrame34();
-  frames_to_read[3] = new TFrame37();
-  frames_to_read[4] = new TFrame39();
-  frames_to_read[5] = new TFrame35();
-  frames_to_read[6] = new TFrame3b();
+  frames_to_read[1] = new TFrame34();
+  frames_to_read[2] = new TFrame39();
+  frames_to_read[3] = new TFrame35();
+  frames_to_read[4] = new TFrame3b();
 
   //frames to write
   SimulateTempFrame = new TFrameSetTemp(0x02);
@@ -381,7 +381,7 @@ void loop() {
     //if all the extra frames can be read successfully, there is no need to send
     //the master frames to assign frame ranges
     boolean extraFramesOk=true;
-    for (int i=2; i<FRAMES_TO_READ; i++) {
+    for (int i=1; i<FRAMES_TO_READ; i++) {
        if (!frames_to_read[i]->getDataOk()) {
           extraFramesOk=false;
           break;
