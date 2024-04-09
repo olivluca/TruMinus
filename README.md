@@ -30,7 +30,7 @@ To connect to the combi you can follow the "Hardware requirements" section of th
 I used pin 19 for TX (connected to the RX of the transceiver) and pin 18 for RX (connected to the TX of the transceiver) but you can change the pins
 with the defines in `main.cpp`.
 
-Also, since this is the master on the lin-bus, if you use the same transceiver you should bridge the `LIN` and `INH` terminals of the transceiver.
+Also, since this is the master on the lin-bus, if you use the same [transceiver](https://www.aliexpress.com/item/4001054538389.html) you should bridge the `LIN` and `INH` terminals of the transceiver.
 
 ## web interface
 
