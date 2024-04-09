@@ -27,6 +27,16 @@ function ShowModal() {
 
 ShowModal();
 
+function EnableFanSpeed(enable) {
+    document.getElementById("fanspeed").disabled=!enable;
+}
+
+function EnableFan() {
+    enabled=document.getElementById("boiler").value=="off"
+      || document.getElementById("temperature-on").checked;
+    document.getElementById("fan").disabled=!enabled;  
+}
+
 function ShowResetButton() {
     button=document.getElementById("error_reset_button");
     if (showing_reset && !doingreset ) {
@@ -51,14 +61,20 @@ function ShowResetButton() {
         if (id=="temp") {
             if (parseFloat(value)==0) {
                 document.getElementById("temperature-on").checked=false;
+                EnableFanSpeed(true);
             } else {
                 document.getElementById("temperature-on").checked=true;
                 document.getElementById("temp").value=value;
+                EnableFanSpeed(false);
             }
+            EnableFan();
         } else {
             const control = document.getElementById(id);
             if (control) {
                control.value = value;
+               if (id=="boiler") {
+                    EnableFan();
+               }
             }
         }
     }
@@ -208,6 +224,7 @@ function ShowResetButton() {
     // Event listeners for control selections
     document.getElementById('boiler').addEventListener('change', function () {
         sendControlSelection('/boiler', this.value);
+        EnableFan();
     });
 
 
@@ -221,8 +238,10 @@ function ShowResetButton() {
         val=30.0;
       }
       t.value=val.toFixed(1).toString();
-      if(document.getElementById('temperature-on').checked)
+      if(document.getElementById('temperature-on').checked) {
         sendControlSelection('/temp', t.value);
+        EnableFan();
+      }
     }
 
     var delayTimer;
@@ -232,8 +251,10 @@ function ShowResetButton() {
             val = parseFloat(this.value);
             if (val>=5.0 && val<=30.0) {
               this.value=val.toFixed(1).toString();
-              if(document.getElementById('temperature-on').checked)
+              if(document.getElementById('temperature-on').checked) {
                 sendControlSelection('/temp', this.value);
+                EnableFan();
+              }
             } else 
             {
             delayTimer = setTimeout(function() {
@@ -245,8 +266,10 @@ function ShowResetButton() {
                  val=30.0;
                };
                this.value = val.toFixed(1).toString();
-               if(document.getElementById('temperature-on').checked)
-                 sendControlSelection('/temp', this.value)
+               if(document.getElementById('temperature-on').checked) {
+                 sendControlSelection('/temp', this.value);
+                 EnableFan();
+               }
             }, 800);
             } 
      
@@ -257,6 +280,7 @@ function ShowResetButton() {
           sendControlSelection('/temp',document.getElementById('temp').value);
         else
           sendControlSelection('/temp', '0.0');
+        EnableFan();
     });
 
     document.getElementById('fan').addEventListener('change', function () {

@@ -292,8 +292,17 @@ void loop() {
   } else {
     //heating active
     LocSetPointTemp = LocRoomSetpoint;
-    //both the "high" (-2) setting and speed 2 will set the fan to high 
-    if (LocFanMode==-2||LocFanMode==2) {
+    //force the setting of the fan if it's not already ok for heating
+    if (LocFanMode!=-1 && LocFanMode!=-2) {
+      if (LocFanMode==2) {
+        FanMode->setValue("high",true);
+        LocFanMode=-2;
+      } else {
+        FanMode->setValue("eco",true);
+        LocFanMode=-1;
+      }
+    } 
+    if (LocFanMode==-2) {
       PumpOrFan = 2; //high
     } else {
       PumpOrFan = 1; //eco
