@@ -615,9 +615,9 @@ void LedLoop(void * pvParameters) {
   while(1) {
     while (inota) {
       digitalWrite(LED,LED_ON);
-      delay(100);
+      delay(50);
       digitalWrite(LED,LED_OFF);
-      delay(100);
+      delay(50);
     }
     delay(500);
     if (wifiok && trumaok && mqttok && !truma_reset) {
