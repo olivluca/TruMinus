@@ -17,6 +17,7 @@
 #ifdef WEBSERVER
 #include "webserver.hpp"
 #endif
+#include <ArduinoOTA.h>
 
 //adapt these to your board
 #ifdef C3
@@ -85,6 +86,8 @@ unsigned long truma_reset_max_time;
 //time to keep the truma on when there's nothing on
 //(necessary to switch the fan speed to 0)
 unsigned long off_delay;
+
+boolean inota=false;
 
 //serial port commands
 TCommandReader CommandReader;
@@ -196,6 +199,35 @@ void setup() {
       1,         // Priority of the task
       NULL      // Task handle
     );
+  ArduinoOTA
+      .onStart([]() {
+        String type;
+        if (ArduinoOTA.getCommand() == U_FLASH)
+          type = "sketch";
+        else {// U_SPIFFS
+          type = "filesystem";
+          LittleFS.end();
+        }
+        // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+        inota=true;
+        Serial.println("Start updating " + type);
+      })
+      .onEnd([]() {
+        inota=false;
+        Serial.println("\nEnd");
+      })
+      .onProgress([](unsigned int progress, unsigned int total) {
+        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+      })
+      .onError([](ota_error_t error) {
+        inota=false;
+        Serial.printf("Error[%u]: ", error);
+        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+        else if (error == OTA_END_ERROR) Serial.println("End Failed");
+      });
 }
 
 //enable/disables the master frames to assign frame ranges
@@ -240,6 +272,10 @@ void NextMasterFrame() {
 void CheckWifi() {
   // check wifi connectivity
   if (WiFi.status()==WL_CONNECTED) {
+    if (!wifiok) {
+      ArduinoOTA.setHostname("truminus");
+      ArduinoOTA.begin();
+    }
     wifiok=true;
     lastwifi=millis();
     if (!wifistarted) {
@@ -252,6 +288,10 @@ void CheckWifi() {
       #endif
     } 
   } else {
+    if (wifiok) {
+      ArduinoOTA.end();
+      inota=false;
+    }
     wifiok=false;
     unsigned long elapsed=millis()-lastwifi;
     if (elapsed>10000) {
@@ -265,6 +305,9 @@ void CheckWifi() {
 void loop() {
 
   CheckWifi();
+  if (wifiok) {
+    ArduinoOTA.handle();
+  }
 
   byte PumpOrFan;
   double LocSetPointTemp = 0.0;
@@ -570,6 +613,12 @@ void onConnectionEstablishedCallback(esp_mqtt_client_handle_t client) {
 void LedLoop(void * pvParameters) {
   int flashes;
   while(1) {
+    while (inota) {
+      digitalWrite(LED,LED_ON);
+      delay(100);
+      digitalWrite(LED,LED_OFF);
+      delay(100);
+    }
     delay(500);
     if (wifiok && trumaok && mqttok && !truma_reset) {
       digitalWrite(LED,LED_ON);
