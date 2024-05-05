@@ -1,4 +1,9 @@
-var gateway = `ws://${window.location.hostname}/ws`;
+var gateway
+if (window.location.port) {
+    gateway = `ws://${window.location.hostname}:${window.location.port}/ws`;
+} else {
+    gateway = `ws://${window.location.hostname}/ws`;
+}  
 var showing_reset = false;
 var modal = document.getElementById("modal");
 var modal_text = document.getElementById("modal-text");
