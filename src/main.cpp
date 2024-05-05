@@ -21,6 +21,7 @@
 
 //adapt these to your board
 #ifdef C3
+#define RED_LED 3
 #define LED 4
 #define LED_ON LOW
 #define LED_OFF HIGH
@@ -129,7 +130,10 @@ void setup() {
   LinBus.rxPin=RX_PIN;
   LinBus.verboseMode=0;
 
-  pinMode(LED,OUTPUT); 
+  pinMode(LED,OUTPUT);
+  #ifdef RED_LED
+  pinMode(RED_LED,OUTPUT);
+  #endif 
 
   //frames to read
   //frames 0x14 and 0x37 are defined but are useless for this model of combi D
@@ -614,6 +618,9 @@ void LedLoop(void * pvParameters) {
   int flashes;
   while(1) {
     while (inota) {
+      #ifdef RED_LED
+      digitalWrite(RED_LED, LED_OFF);
+      #endif
       digitalWrite(LED,LED_ON);
       delay(50);
       digitalWrite(LED,LED_OFF);
@@ -621,6 +628,9 @@ void LedLoop(void * pvParameters) {
     }
     delay(500);
     if (wifiok && trumaok && mqttok && !truma_reset) {
+      #ifdef RED_LED
+      digitalWrite(RED_LED, LED_OFF);
+      #endif
       digitalWrite(LED,LED_ON);
       continue;
     }
@@ -634,10 +644,18 @@ void LedLoop(void * pvParameters) {
       flashes=4;
     }
     while (flashes-->0) {
+      #ifdef RED_LED
+      digitalWrite(LED, LED_OFF);
+      digitalWrite(RED_LED,LED_ON);
+      delay(200);
+      digitalWrite(RED_LED,LED_OFF);
+      delay(200);
+      #else
       digitalWrite(LED,LED_ON);
       delay(200);
       digitalWrite(LED,LED_OFF);
       delay(200);
+      #endif
     }
   }
 }
