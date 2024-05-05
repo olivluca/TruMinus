@@ -14,6 +14,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       return; 
     }
     if (message=="ping"){
+      if (wsCb!=NULL) {
+        wsCb("/ping","1");
+      }
       return;
     }
     JsonDocument doc;
@@ -39,6 +42,9 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   switch (type) {
     case WS_EVT_CONNECT:
       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      if (wsCb!=NULL) {
+        wsCb("/ping","1");
+      }
       break;
     case WS_EVT_DISCONNECT:
       Serial.printf("WebSocket client #%u disconnected\n", client->id());

@@ -80,6 +80,8 @@ boolean truma_reset_stop_comm=false;
 //new web client or new connection to the broker, force a 
 //send of the frame received data
 boolean doforcesend=false;
+//keep truma on (websocket or screen active)
+boolean forceon=false;
 //delay to stop the communication during reset
 unsigned long truma_reset_delay;
 //max time to wait for the truma to report status 1 during reset
@@ -387,14 +389,15 @@ void loop() {
     }
   } else
   //no reset requested, turn on the heater if is there something active
-  if (LocSetPointTemp>=5.0 || LocWaterSetpoint > 0.0 || LocFanMode > 0 ) {
+  if (LocSetPointTemp>=5.0 || LocWaterSetpoint > 0.0 || LocFanMode > 0 || forceon) {
     onOff->SetOn(true);
+    forceon = false;
     off_delay = millis();
   } else {
     //keep the heater on for a while (so it can send the frames to stop the fan without activating the boiler)
     if (onOff->GetOn()) {
        unsigned long elapsed=millis()-off_delay;
-       if (elapsed>10000) {
+       if (elapsed>20000) {
         onOff->SetOn(false);
        }
     }
@@ -561,9 +564,17 @@ void handleSetting(const String& topic, const String& payload, boolean local)  {
       HandleCommandReset();
       return;
     }   
+
+    //keep the truma on (to refresh values)
+    if (topic=="truma/set/ping") {
+      forceon = true;
+      return;
+    }
+
     //refresh request
     if (topic=="truma/set/refresh") {
-      doforcesend=true;
+      forceon=true;
+      doforcesend=true; 
       return;
     }
     //otherwise pass it on to each mqtt setting
