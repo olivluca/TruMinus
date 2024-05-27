@@ -18,6 +18,7 @@
 #include "webserver.hpp"
 #endif
 #include <ArduinoOTA.h>
+#include <esp_task_wdt.h>
 
 //adapt these to your board
 #ifdef C3
@@ -224,6 +225,7 @@ void setup() {
       })
       .onProgress([](unsigned int progress, unsigned int total) {
         Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        esp_task_wdt_reset();
       })
       .onError([](ota_error_t error) {
         inota=false;
@@ -234,6 +236,8 @@ void setup() {
         else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR) Serial.println("End Failed");
       });
+  esp_task_wdt_init(10,true);
+  esp_task_wdt_add(NULL);    
 }
 
 //enable/disables the master frames to assign frame ranges
@@ -309,7 +313,7 @@ void CheckWifi() {
 
 //-------------------------------------------------------------------------
 void loop() {
-
+  esp_task_wdt_reset();
   CheckWifi();
   if (wifiok) {
     ArduinoOTA.handle();
