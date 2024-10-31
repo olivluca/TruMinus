@@ -22,9 +22,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, message);
     if (error.code()==DeserializationError::Ok) {
-      if (doc.containsKey("id") && doc.containsKey("value")) { 
-        String id=doc["id"].as<String>();
-        String value=doc["value"].as<String>();
+      const char *id=doc["id"];
+      const char *value=doc["value"];
+      if (id && value) { 
         if (wsCb!=NULL) {
           wsCb(id,value);
         }
