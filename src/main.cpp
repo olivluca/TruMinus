@@ -181,6 +181,11 @@ void setup() {
   //master frames
   onOff = new TOnOff();
   #ifdef COMBIGAS
+  /* to enable diagnostic framess
+    new TAssignFrameRanges(0x0b, {0x33, 0x34, 0x35, 0x36});
+    new TAssignFrameRanges(0x0f, {0x37, 0x38, 0x39, 0x3a});
+    new TAssignFrameRanges(0x13, {0x3b, 0xff, 0xff, 0xff})
+  */
   master_frames[0] = onOff;
   #else
   master_frames[0] = new TAssignFrameRanges(0x09, {0x3b, 0x3a, 0x39, 0x38});
