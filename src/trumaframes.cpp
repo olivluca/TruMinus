@@ -296,6 +296,39 @@ void TFrameSetPowerLimit::setPowerLimit(TEnergySelection EnergySelection)
     memcpy(&fdata[0],&limit,2);
 }
 
+TFrameSetControlElements::TFrameSetControlElements(uint8_t frameid)
+{
+    fframeid=frameid;
+    SetSummerWinterMode(SWSummer60);
+    SetElectroGasMix(GMGas);
+    SetTempSetpoint(0);
+    SetDiensteLin(0);
+}
+
+void TFrameSetControlElements::SetSummerWinterMode(TSummerWinterMode SummerWinterMode)
+{
+    fSummerWinterMode=SummerWinterMode;
+    fdata[0] = fdata[0] & 0xf0 | fSummerWinterMode;
+}
+
+void TFrameSetControlElements::SetElectroGasMix(TElectroGasMixMode ElectroGasMixMode)
+{
+    fElectroGasMixMode=ElectroGasMixMode;
+    fdata[0] = fdata[0] & 0x0f | (fElectroGasMixMode << 4);
+}
+
+void TFrameSetControlElements::SetTempSetpoint(uint16_t TempSetpoint)
+{
+    fTempSetpoint=TempSetpoint;
+    uint16_t temp=htole16(fTempSetpoint);
+    memcpy(&fdata[1],&temp,2);
+}
+
+void TFrameSetControlElements::SetDiensteLin(uint8_t DiensteLin)
+{
+    fDiensteLin=DiensteLin;
+    fdata[2]=fDiensteLin;
+}
 
 TMasterFrame::TMasterFrame(uint8_t nad, uint8_t len, uint8_t sid ):TFrameBase()
 {

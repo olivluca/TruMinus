@@ -40,14 +40,21 @@ Lin_Interface LinBus(1);
 //Waterboost management
 TWaterBoost *WaterBoost;
 
-//the frames to be read
+#ifdef COMBIGAS
+#define FRAMES_TO_READ 1
+#define FRAMES_TO_WRITE 7
+#define MASTER_FRAMES 1
+#else
 #define FRAMES_TO_READ 5
+#define FRAMES_TO_WRITE 6
+#define MASTER_FRAMES 5
+#endif
+//the frames to be read
 TFrameBase * frames_to_read[FRAMES_TO_READ];
  //I only care about frame 16 content, the remaining frames will be 
  //directly allocated in frames_to_read
 TFrame16 *Frame16;
 //the frames to be written
-#define FRAMES_TO_WRITE 6
 TFrameBase * frames_to_write[FRAMES_TO_WRITE];
 TFrameSetTemp *SimulateTempFrame;
 TFrameSetTemp *RoomSetpointFrame;
@@ -55,6 +62,9 @@ TFrameSetTemp *WaterSetpointFrame;
 TFrameEnergySelect *EnergySelect;
 TFrameSetPowerLimit *SetPowerLimit;
 TFrameSetFan *FanFrame;
+#ifdef COMBIGAS
+TFrameSetControlElements *ControlElementsFrame;
+#endif
 //the setpoints
 #define SETPOINTS 4
 TMqttSetting * MqttSetpoint[SETPOINTS];
@@ -64,7 +74,6 @@ TBoilerSetting *WaterSetpoint;
 TFanSetting *FanMode;
 
 //master frames
-#define MASTER_FRAMES 5
 TMasterFrame * master_frames[MASTER_FRAMES];
 //I'll only need to manage these 2 master frames,
 //the remaininig one will be directly allocated in master_frames
@@ -143,10 +152,12 @@ void setup() {
   //so they're not read
   Frame16=new TFrame16();
   frames_to_read[0] = Frame16;
+  #ifndef COMBIGAS
   frames_to_read[1] = new TFrame34();
   frames_to_read[2] = new TFrame39();
   frames_to_read[3] = new TFrame35();
   frames_to_read[4] = new TFrame3b();
+  #endif
 
   //frames to write
   SimulateTempFrame = new TFrameSetTemp(0x02);
@@ -162,15 +173,23 @@ void setup() {
   frames_to_write[3] = EnergySelect;
   frames_to_write[4] = SetPowerLimit;
   frames_to_write[5] = FanFrame;
+  #ifdef COMBIGAS
+  ControlElementsFrame = new TFrameSetControlElements(0x1D);
+  frames_to_write[6] = ControlElementsFrame;
+  #endif
 
   //master frames
+  onOff = new TOnOff();
+  #ifdef COMBIGAS
+  master_frames[0] = onOff;
+  #else
   master_frames[0] = new TAssignFrameRanges(0x09, {0x3b, 0x3a, 0x39, 0x38});
   master_frames[1] = new TAssignFrameRanges(0x0d, {0x37, 0x36, 0x35, 0x34});
   master_frames[2] = new TAssignFrameRanges(0x11, {0x33, 0x32, 0xff, 0xff});
-  onOff = new TOnOff();
   master_frames[3] = onOff;
   getErrorInfo = new TGetErrorInfo();
   master_frames[4] = getErrorInfo;
+  #endif
 
   //setpoints
   SimulatedTemp = new TTempSetting("/simultemp", -273.0, 30.0);
@@ -242,23 +261,30 @@ void setup() {
 
 //enable/disables the master frames to assign frame ranges
 void AssignFrameRanges(boolean on) {
+#ifndef COMBIGAS
   for (int i=0; i<3; i++) {
     master_frames[i]->setEnabled(on && !truma_reset);
   }
+#endif
 }
 
 // When performing a reset only enable the onOff master frame
 void EnableOnlyOnOff(boolean on) {
+#ifndef COMBIGAS
   for (int i=0; i<MASTER_FRAMES; i++) {
     master_frames[i]->setEnabled(!on);
   }
   if (on) {
     onOff->setEnabled(true);
   }
+#endif
 }
 
 // finds the next enabled master frame
 void NextMasterFrame() {
+#ifdef COMBIGAS
+  current_master_frame = 0;
+#else
   current_master_frame++;
   if (current_master_frame>=MASTER_FRAMES) {
     current_master_frame=0;
@@ -276,6 +302,7 @@ void NextMasterFrame() {
   }
   //no master frame enabled
   current_master_frame=-1;
+#endif
 }
 
 //checks and restart the wifi connection

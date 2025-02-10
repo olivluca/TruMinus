@@ -123,6 +123,15 @@ struct frameFanModeData
     uint8_t empty[6];
 };
 
+struct frameControlElements //only for gas
+{
+   uint8_t summerwintermode:4; //0 summer 60, 1 summer 40, 2 winter 10, 3 winter 40, 4 winter 60
+   uint8_t electrogasmixmode:4; //0 electric full, 1 electric half, 2 gas, 3 mixed half, 4 mixed full
+   uint16_t roomsetpoint;
+   uint8_t dienste_lin;
+   uint8_t empty[4];
+};
+
 
 /****************************************************
   Base class for all values to be sent to the mqtt broker
@@ -507,6 +516,23 @@ class TFrameSetPowerLimit: public TFrameBase {
   public:
     TFrameSetPowerLimit(uint8_t frameid);
     void setPowerLimit(TEnergySelection EnergySelection); 
+};
+
+//only for gas
+enum TSummerWinterMode {SWSummer60=0, SWSummer40, SWWinter10, SWWinter40, SWWinter60};
+enum TElectroGasMixMode {GMFullElectric=0, GMHalfElectric, GMGas, GMFullMixed, GMHalfMixed};
+class TFrameSetControlElements: public TFrameBase {
+  private:
+    TSummerWinterMode fSummerWinterMode;
+    TElectroGasMixMode fElectroGasMixMode;
+    uint16_t fTempSetpoint;
+    uint8_t fDiensteLin;
+  public:
+    TFrameSetControlElements(uint8_t frameid);
+    void SetSummerWinterMode(TSummerWinterMode SummerWinterMode);
+    void SetElectroGasMix(TElectroGasMixMode ElectroGasMixMode);
+    void SetTempSetpoint(uint16_t TempSetpoint);
+    void SetDiensteLin(uint8_t DiensteLin);
 };
 
 /*******************************************************************
