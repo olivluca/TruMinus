@@ -250,6 +250,7 @@ void setup() {
       .onProgress([](unsigned int progress, unsigned int total) {
         Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
         esp_task_wdt_reset();
+        delay(1);
       })
       .onError([](ota_error_t error) {
         inota=false;
@@ -260,7 +261,12 @@ void setup() {
         else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR) Serial.println("End Failed");
       });
-  esp_task_wdt_init(10,true);
+  esp_task_wdt_config_t wdt_config = {
+        .timeout_ms = 10000,
+        .idle_core_mask = (1 << portNUM_PROCESSORS) - 1,  // Bitmask of all cores, https://github.com/espressif/esp-idf/blob/v5.2.2/examples/system/task_watchdog/main/task_watchdog_example_main.c
+        .trigger_panic = true                             // Enable panic to restart ESP32
+  };
+  esp_task_wdt_init(&wdt_config);
   esp_task_wdt_add(NULL);    
 }
 
@@ -346,6 +352,7 @@ void CheckWifi() {
 //-------------------------------------------------------------------------
 void loop() {
   esp_task_wdt_reset();
+  delay(1);
   CheckWifi();
   if (wifiok) {
     ArduinoOTA.handle();
@@ -572,12 +579,12 @@ void loop() {
 }
 
 /* mqtt handling */
-esp_err_t handleMQTT(esp_mqtt_event_handle_t event) {
+void handleMQTT(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data){
+  auto *event = static_cast<esp_mqtt_event_handle_t>(event_data);
   if (event->event_id==MQTT_EVENT_DISCONNECTED || event->event_id == MQTT_EVENT_ERROR) {
     mqttok=false;
   } 
   mqttClient.onEventCallback(event);
-  return ESP_OK;
 }
 
 //start an error reset (either from an mqtt or websocket message)
@@ -654,7 +661,7 @@ void wsConnected() {
 
 // connection to the broker established, subscribe to the settings and
 // force publish the next received data
-void onConnectionEstablishedCallback(esp_mqtt_client_handle_t client) {
+void onMqttConnect(esp_mqtt_client_handle_t client) {
   doforcesend=true;
   mqttok=true;
   mqttClient.subscribe(BaseTopicSet+"/#", callback);
