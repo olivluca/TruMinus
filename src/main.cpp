@@ -266,8 +266,16 @@ void setup() {
         .idle_core_mask = (1 << portNUM_PROCESSORS) - 1,  // Bitmask of all cores, https://github.com/espressif/esp-idf/blob/v5.2.2/examples/system/task_watchdog/main/task_watchdog_example_main.c
         .trigger_panic = true                             // Enable panic to restart ESP32
   };
-  esp_task_wdt_init(&wdt_config);
-  esp_task_wdt_add(NULL);    
+  esp_err_t e=esp_task_wdt_init(&wdt_config);
+  if (e==ESP_ERR_INVALID_STATE) {
+    Serial.println("watchdog already configured, reconfiguring");
+    e=esp_task_wdt_reconfigure(&wdt_config);
+  }
+  if (e==ESP_OK) {
+    Serial.println("Watchdog initialized ok");
+  } else {
+    Serial.println("Failed to initialize watchdog");
+  }
 }
 
 //enable/disables the master frames to assign frame ranges
