@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <ESP32MQTTClient.h>
 #include <WiFi.h>
-//------ you should create your own wifi.h with
+//------ you should create your own wifi_config.h with
 //#define WLAN_SSID "your_ssid"
 //#define WLAN_PASS "your_password"
 //#define MQTT_URI "mqtt://x.x.x.x:1883"
 //#define MQTT_USERNAME ""
 //#define MQTT_PASSWORD ""
-#include "wifi.h"
+#include "wifi_config.h"
 #include "globals.hpp"
 #include "trumaframes.hpp"
 #include "settings.hpp"

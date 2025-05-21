@@ -16,7 +16,7 @@ USE THE PROGRAM.
 
 ## build it
 
-To build it you'll need [platformio](https://platformio.org/). You should also create a `wifi.h` file with the details of your wifi access point and
+To build it you'll need [platformio](https://platformio.org/). You should also create a `wifi_config.h` file with the details of your wifi access point and
 of your mqtt broker, please see the comments in `main.cpp`.
 
 Change the settings in `platformio.ini` to suit your board and your preferences.
