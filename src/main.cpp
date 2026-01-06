@@ -363,11 +363,12 @@ void loop() {
   double LocSetPointTemp = 0.0;
   double LocRoomSetpoint = RoomSetpoint->getFloatValue();
   double LocWaterSetpoint = WaterSetpoint->getFloatValue();
+  boolean LocHeatingOn = HeatingOn->getIntValue()!=0;
   int LocFanMode = FanMode->getIntValue();
 
 
   //determines operating mode
-  if (HeatingOn->getIntValue()==0) {
+  if (!LocHeatingOn) {
      //no heating
      if (LocWaterSetpoint<=0.0) {
        //no boiler 
@@ -433,7 +434,7 @@ void loop() {
     }
   } else
   //no reset requested, turn on the heater if is there something active
-  if (LocSetPointTemp>=5.0 || LocWaterSetpoint > 0.0 || LocFanMode > 0 || forceon) {
+  if (LocHeatingOn || LocWaterSetpoint > 0.0 || LocFanMode > 0 || forceon) {
     onOff->SetOn(true);
     forceon = false;
     off_delay = millis();
