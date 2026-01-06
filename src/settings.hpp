@@ -70,3 +70,12 @@ class TFanSetting : public TMqttSetting {
         setValue("off");
       };
 }; 
+
+class TOnOffSetting : public TMqttSetting {
+    protected:
+     virtual bool Validate(String newvalue) override;
+    public:
+      TOnOffSetting(String topic) : TMqttSetting(topic, SKString){
+        setValue(0);
+      };
+}; 

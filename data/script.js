@@ -37,8 +37,9 @@ function EnableFanSpeed(enable) {
 }
 
 function EnableFan() {
-    enabled=document.getElementById("boiler").value=="off"
-      || document.getElementById("temperature-on").checked;
+    heating=document.getElementById("heating").checked;
+    EnableFanSpeed(!heating);
+    enabled=document.getElementById("boiler").value=="off" || heating;
     document.getElementById("fan").disabled=!enabled;  
 }
 
@@ -63,23 +64,15 @@ function ShowResetButton() {
 
     // Function to update control values
     function updateControl(id, value) {
-        if (id=="temp") {
-            if (parseFloat(value)==0) {
-                document.getElementById("temperature-on").checked=false;
-                EnableFanSpeed(true);
+        const control = document.getElementById(id);
+        if (control) {
+            if (control.type=="checkbox") {
+                control.checked=parseInt(value);
             } else {
-                document.getElementById("temperature-on").checked=true;
-                document.getElementById("temp").value=value;
-                EnableFanSpeed(false);
+                control.value = value;
             }
-            EnableFan();
-        } else {
-            const control = document.getElementById(id);
-            if (control) {
-               control.value = value;
-               if (id=="boiler") {
-                    EnableFan();
-               }
+            if (id=="boiler" || id=="heating") {
+                EnableFan();
             }
         }
     }
@@ -232,8 +225,23 @@ function ShowResetButton() {
         EnableFan();
     });
 
+    var tempTimer;
+
+    function ValidateAndSetTemperature() {
+        elem=document.getElementById('temp');
+        val = parseFloat(elem.value);
+        if (val<5.0) {
+            val=5.0;
+        };
+        if (val>30.0) {
+            val=30.0;
+        };
+        elem.value = val.toFixed(1).toString();
+        sendControlSelection('/temp', elem.value);
+    }
 
     function changeTemp(increment) {
+      clearTimeout(tempTimer);
       t=document.getElementById('temp');
       val=parseFloat(t.value)+increment;
       if (val<5.0) {
@@ -243,48 +251,19 @@ function ShowResetButton() {
         val=30.0;
       }
       t.value=val.toFixed(1).toString();
-      if(document.getElementById('temperature-on').checked) {
-        sendControlSelection('/temp', t.value);
-        EnableFan();
-      }
+      tempTimer = setTimeout(ValidateAndSetTemperature, 800);
     }
 
-    var delayTimer;
-    
     document.getElementById('temp').addEventListener('input', function() {
-            clearTimeout(delayTimer);
-            val = parseFloat(this.value);
-            if (val>=5.0 && val<=30.0) {
-              this.value=val.toFixed(1).toString();
-              if(document.getElementById('temperature-on').checked) {
-                sendControlSelection('/temp', this.value);
-                EnableFan();
-              }
-            } else 
-            {
-            delayTimer = setTimeout(function() {
-               val = parseFloat(this.value);
-               if (val<5.0) {
-                 val=5.0;
-               };
-               if (val>30.0) {
-                 val=30.0;
-               };
-               this.value = val.toFixed(1).toString();
-               if(document.getElementById('temperature-on').checked) {
-                 sendControlSelection('/temp', this.value);
-                 EnableFan();
-               }
-            }, 800);
-            } 
-     
+            clearTimeout(tempTimer);
+            tempTimer = setTimeout(ValidateAndSetTemperature, 800);
     });
 
-    document.getElementById('temperature-on').addEventListener('change', function () {
+    document.getElementById('heating').addEventListener('change', function () {
         if (this.checked) 
-          sendControlSelection('/temp',document.getElementById('temp').value);
+          sendControlSelection('/heating','1');
         else
-          sendControlSelection('/temp', '0.0');
+          sendControlSelection('/heating', '0');
         EnableFan();
     });
 

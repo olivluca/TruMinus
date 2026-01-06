@@ -159,6 +159,19 @@ bool TFanSetting::Validate(String newvalue)
     return false;
 }
 
+bool TOnOffSetting::Validate(String newvalue)
+{
+    int num=atoi(newvalue.c_str());
+    if (String(num)==newvalue && num>=0  && num<=1 ) {
+        setValue(num,false);
+        return TMqttSetting::Validate(num);
+    }
+    Serial.print(newvalue);
+    Serial.print(" is not a valid value for ");
+    Serial.println(ftopic);
+    return false;
+}
+
 bool TTempSetting::Validate(double newvalue)
 {
     if (newvalue>=fminvalue && newvalue<=fmaxvalue) {

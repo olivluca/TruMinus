@@ -66,12 +66,13 @@ TFrameSetFan *FanFrame;
 TFrameSetControlElements *ControlElementsFrame;
 #endif
 //the setpoints
-#define SETPOINTS 4
+#define SETPOINTS 5
 TMqttSetting * MqttSetpoint[SETPOINTS];
 TTempSetting *SimulatedTemp;
 TTempSetting *RoomSetpoint;
 TBoilerSetting *WaterSetpoint;
 TFanSetting *FanMode;
+TOnOffSetting *HeatingOn;
 
 //master frames
 TMasterFrame * master_frames[MASTER_FRAMES];
@@ -198,13 +199,15 @@ void setup() {
 
   //setpoints
   SimulatedTemp = new TTempSetting("/simultemp", -273.0, 30.0);
-  RoomSetpoint = new TTempSetting("/temp", 0.0, 30.0);
+  RoomSetpoint = new TTempSetting("/temp", 5.0, 30.0);
+  HeatingOn = new TOnOffSetting("/heating");
   WaterSetpoint = new TBoilerSetting("/boiler");
   FanMode = new TFanSetting("/fan");
   MqttSetpoint[0] = SimulatedTemp;
   MqttSetpoint[1] = RoomSetpoint;
-  MqttSetpoint[2] = WaterSetpoint;
-  MqttSetpoint[3] = FanMode;
+  MqttSetpoint[2] = HeatingOn;
+  MqttSetpoint[3] = WaterSetpoint;
+  MqttSetpoint[4] = FanMode;
 
   //waterboost
   WaterBoost = new TWaterBoost(WaterSetpoint,"high","/waterboost");
@@ -360,7 +363,7 @@ void loop() {
 
 
   //determines operating mode
-  if (LocRoomSetpoint<5.0) {
+  if (HeatingOn->getIntValue()==0) {
      //no heating
      if (LocWaterSetpoint<=0.0) {
        //no boiler 
@@ -535,7 +538,8 @@ void loop() {
        Serial.println("mqttdebug on|off");
        Serial.println("reset");
        Serial.println("simultemp -273.0 (off)..30.0");
-       Serial.println("temp 0.0 (off)..30.0");
+       Serial.println("temp 5.0..30.0");
+       Serial.println("heating 0|1");
        Serial.println("boiler off|eco|high|boost");
        Serial.println("fan off|eco|high|1..10");   
        found=true;   
