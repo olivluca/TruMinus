@@ -34,6 +34,10 @@
 #define TX_PIN 19
 #define RX_PIN 18
 
+#define STATUS_TOPIC "truma/status/online"
+#define STATUS_OFFLINE "offline"
+#define STATUS_ONLINE "online"
+
 //Lin master
 Lin_Interface LinBus(1); 
 
@@ -219,7 +223,7 @@ void setup() {
 
   //starts the mqtt connection to the broker
   mqttClient.setURI(MQTT_URI, MQTT_USERNAME, MQTT_PASSWORD);
-  mqttClient.enableLastWillMessage("truma/lwt", "I am going offline");
+  mqttClient.enableLastWillMessage(STATUS_TOPIC, STATUS_OFFLINE, true);
   mqttClient.setKeepAlive(30);
   mqttClient.enableDebuggingMessages(false);
   mqttClient.loopStart();
@@ -663,6 +667,7 @@ void onConnectionEstablishedCallback(esp_mqtt_client_handle_t client) {
   doforcesend=true;
   mqttok=true;
   mqttClient.subscribe(BaseTopicSet+"/#", callback);
+  mqttClient.publish(STATUS_TOPIC, STATUS_ONLINE, 2, true);
 }
 
 //------------------------------------------------------------------------
