@@ -1,5 +1,6 @@
 #pragma once
 #include <ESP32MQTTClient.h>
+#include "autodiscovery.hpp"
 #include "globals.hpp"
 
 /*
@@ -10,7 +11,7 @@
 */
 
 enum SettingKind { SKFloat, SKInt, SKString };
-class TMqttSetting {
+class TMqttSetting: public TAutoDiscovery{
   private:
     SettingKind fkind;
     #ifdef WEBSERVER
@@ -43,9 +44,7 @@ class TBoilerSetting : public TMqttSetting {
     protected:
      virtual bool Validate(String newvalue) override;
     public:
-      TBoilerSetting(String topic) : TMqttSetting(topic, SKString) {
-        setValue("off");
-      };
+      TBoilerSetting(String topic);
 }; 
 
 class TTempSetting : public TMqttSetting {
@@ -55,27 +54,19 @@ class TTempSetting : public TMqttSetting {
     protected:
      virtual bool Validate(double newvalue) override; 
     public:
-      TTempSetting(String topic, double minvalue, double maxvalue) : TMqttSetting(topic, SKFloat) {
-        fminvalue=minvalue;
-        fmaxvalue=maxvalue;
-        setValue(fminvalue);
-      };
+      TTempSetting(String topic, double minvalue, double maxvalue);
 }; 
 
 class TFanSetting : public TMqttSetting {
     protected:
      virtual bool Validate(String newvalue) override;
     public:
-      TFanSetting(String topic) : TMqttSetting(topic, SKString){
-        setValue("off");
-      };
+      TFanSetting(String topic);
 }; 
 
 class TOnOffSetting : public TMqttSetting {
     protected:
      virtual bool Validate(String newvalue) override;
     public:
-      TOnOffSetting(String topic) : TMqttSetting(topic, SKString){
-        setValue(0);
-      };
+      TOnOffSetting(String topic);
 }; 

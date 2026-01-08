@@ -10,6 +10,7 @@
 #include "wifi_config.h"
 #include "globals.hpp"
 #include "trumaframes.hpp"
+#include "autodiscovery.hpp"
 #include "settings.hpp"
 #include <Lin_Interface.hpp>
 #include "waterboost.hpp"
@@ -33,10 +34,6 @@
 #endif
 #define TX_PIN 19
 #define RX_PIN 18
-
-#define STATUS_TOPIC "truma/status/online"
-#define STATUS_OFFLINE "offline"
-#define STATUS_ONLINE "online"
 
 //Lin master
 Lin_Interface LinBus(1); 
@@ -203,8 +200,11 @@ void setup() {
 
   //setpoints
   SimulatedTemp = new TTempSetting("/simultemp", -273.0, 30.0);
+  SimulatedTemp->setADName("Simulated temperature")->setADEntity_category("diagnostic")->setADIcon("mdi:thermometer-lines");
   RoomSetpoint = new TTempSetting("/temp", 5.0, 30.0);
+  RoomSetpoint->setADName("Temperature setpoint");
   HeatingOn = new TOnOffSetting("/heating");
+  HeatingOn->setADName("Heating")->setADIcon("mdi:radiator");
   WaterSetpoint = new TBoilerSetting("/boiler");
   FanMode = new TFanSetting("/fan");
   MqttSetpoint[0] = SimulatedTemp;
@@ -215,6 +215,10 @@ void setup() {
 
   //waterboost
   WaterBoost = new TWaterBoost(WaterSetpoint,"high","/waterboost");
+
+  //autodiscovery for local topics
+  PublishReset.setADComponent(CKBinary_sensor)->setADName("Resetting")->setADIcon("mdi:sync")->setADDevice_class("connectivity");
+  PublishLinOk.setADComponent(CKBinary_sensor)->setADName("LIN bus status")->setADIcon("mdi:serial-port")->setADDevice_class("connectivity");
 
   //starts the wifi (loop will check if it's connected)
   WiFi.mode(WIFI_STA);
@@ -662,11 +666,35 @@ void wsConnected() {
 }
 #endif
 
+void PublishMqttAutoDiscovery() {
+#ifdef AUTODISCOVERY
+  //create a reset button in home assistant
+  TAutoDiscovery ResetButton;
+  ResetButton.setADTopic("/error_reset")->setADComponent(CKButton)->setADName("Error reset")->setADIcon("mdi:restart")->PublishAutoDiscovery();
+  //publish autodiscovery for local topics
+  PublishReset.PublishAutoDiscovery();
+  PublishLinOk.PublishAutoDiscovery();
+  //publish autodiscovery for setpoints/master frames/frames to read
+  int i;
+  for (i=0; i<SETPOINTS ;i++) {
+    MqttSetpoint[i]->PublishAutoDiscovery();
+  }
+  for (i=0; i<MASTER_FRAMES ;i++) {
+    master_frames[i]->PublishAutoDiscovery();
+  }
+  for (i=0; i<FRAMES_TO_READ ;i++) {
+    frames_to_read[i]->PublishAutoDiscovery();
+  }
+
+#endif
+}
+
 // connection to the broker established, subscribe to the settings and
 // force publish the next received data
 void onConnectionEstablishedCallback(esp_mqtt_client_handle_t client) {
   doforcesend=true;
   mqttok=true;
+  PublishMqttAutoDiscovery();
   mqttClient.subscribe(BaseTopicSet+"/#", callback);
   mqttClient.publish(STATUS_TOPIC, STATUS_ONLINE, 2, true);
 }

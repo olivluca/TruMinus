@@ -27,6 +27,7 @@ double RawToFlameTemperature(const uint8_t RawValue)
 TMqttPublisherBase::TMqttPublisherBase(String topic)
 {
     ftopic=topic;
+    setADTopic(topic);
 }
 
 void TMqttPublisherBase::setValue(uint32_t newvalue)
@@ -119,18 +120,70 @@ void TFrameBase::publishFrameData()
     //do nothing in base class
 }
 
+void TFrameBase::PublishAutoDiscovery()
+{
+    for (int i=0; i<fpublishers.size(); i++) {
+        fpublishers[i]->PublishAutoDiscovery();
+    }
+}
+
 TFrame16::TFrame16():TFrameBase()
 {
     fframeid=0x16;
     fpublishers.push_back(new TPubBool("/antifreeze"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Antifreeze")
+      ->setADIcon("mdi:snowflake")
+      ->setADDevice_class("safety")
+      ->setADPayload_off("1")
+      ->setADPayload_on("0");
     fpublishers.push_back(new TPubBool("/supply220"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("220V supply")
+      ->setADIcon("mdi:power-plug")
+      ->setADDevice_class("power");
     fpublishers.push_back(new TPubBool("/window"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Window")
+      ->setADIcon("mdi:window-closed-variant")
+      ->setADDevice_class("window")
+      ->setADPayload_off("1")
+      ->setADPayload_on("0");
     fpublishers.push_back(new TPubBool("/roomdemand"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Heating active")
+      ->setADIcon("mdi:fire")
+      ->setADDevice_class("heat");
     fpublishers.push_back(new TPubBool("/waterdemand"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Boiler active")
+      ->setADIcon("mdi:water-boiler-auto")
+      ->setADDevice_class("heat");
     fpublishers.push_back(new TPubBool("/error")); 
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("System error")
+      ->setADIcon("mdi:alert")
+      ->setADDevice_class("problem");
     fpublishers.push_back(new TPubTemperature("/room_temp"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Room temperature")
+      ->setADIcon("mdi:home-thermometer")
+      ->setADDevice_class("temperature")
+      ->setADUnit("°C");
     fpublishers.push_back(new TPubTemperature("/water_temp"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Water temperature")
+      ->setADIcon("mdi:water-thermometer")
+      ->setADDevice_class("temperature")
+      ->setADUnit("°C");
     fpublishers.push_back(new TPubVoltage("/voltage"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Supply voltage")
+      ->setADIcon("mdi:car-battery")
+      ->setADDevice_class("voltage")
+      ->setADUnit("V")
+      ->setADSuggested_display_precision(1)
+      ->setADValue_template("{{ value | float(0) | round(1) }}");
 }
 
 void TFrame16::publishFrameData()
@@ -167,11 +220,36 @@ TFrame34::TFrame34() : TFrameBase()
 {
     fframeid=0x34;
     fpublishers.push_back(new TPubOperationTime("/operation_time"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Operation time")
+      ->setADIcon("mdi:clock-check")
+      ->setADEntity_category("diagnostic")
+      ->setADValue_template("{% set total_min = value | int %}{% set days = (total_min // 1440) %}{% set hours = (total_min % 1440) // 60 %}{% set minutes = total_min % 60 %}{{ days }}d {{ hours }}h {{ minutes }}m");
     fpublishers.push_back(new TPubBool("/k1"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Relay K1")
+      ->setADIcon("mdi:dip-switch")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubBool("/k2"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Relay K2")
+      ->setADIcon("mdi:dip-switch")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubBool("/k3"));
+    fpublishers.back()->setADComponent(CKBinary_sensor)
+      ->setADName("Relay K3")
+      ->setADIcon("mdi:dip-switch")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubEbtMode("/ebtmode"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("EBT Mode")
+      ->setADIcon("mdi:cog")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubHydronicStartInfo("/hydr_start_info"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Hydronic start info")
+      ->setADIcon("mdi:information")
+      ->setADEntity_category("diagnostic");
 }
 
 void TFrame34::publishFrameData()
@@ -201,8 +279,28 @@ TFrame39::TFrame39(): TFrameBase()
 {
     fframeid=0x39;
     fpublishers.push_back(new TPubBlowOutTemperature("/blow_out_temp"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Blow out temperature")
+      ->setADIcon("mdi:thermometer")
+      ->setADDevice_class("temperature")
+      ->setADUnit("°C")
+      ->setADSuggested_display_precision(1)
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubPumpFrequency("/pump_freq"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Pump frequency")
+      ->setADIcon("mdi:sine-wave")
+      ->setADUnit("Hz")
+      ->setADSuggested_display_precision(2)
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubFlameTemperature("/flame_temp"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Flame temperature")
+      ->setADIcon("mdi:fire-circle")
+      ->setADDevice_class("temperature")
+      ->setADUnit("°C")
+      ->setADSuggested_display_precision(1)
+      ->setADEntity_category("diagnostic");
 }
 
 void TFrame39::publishFrameData()
@@ -217,10 +315,33 @@ TFrame35::TFrame35(): TFrameBase()
 {
     fframeid = 0x35;
     fpublishers.push_back(new TPubBurnerFanVoltage("/burner_fan_v"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Burner fan voltage")
+      ->setADIcon("mdi:fan-chevron-up")
+      ->setADDevice_class("voltage")
+      ->setADUnit("V")
+      ->setADSuggested_display_precision(1)
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubBurnerStatus("/burner_status"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Burner status")
+      ->setADIcon("mdi:fire")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubGlowPlugStatus("/glow_plug_status"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Glow plug status")
+      ->setADIcon("mdi:radiator")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubHydronicState("/hydronic_state"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Hydronic state")
+      ->setADIcon("mdi:state-machine")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubHydronicFlame("/hydronic_flame"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Hydronic flame")
+      ->setADIcon("mdi:fire-alert")
+      ->setADEntity_category("diagnostic");
 }
 
 void TFrame35::publishFrameData()
@@ -238,10 +359,36 @@ TFrame3b::TFrame3b(): TFrameBase()
     fframeid = 0x3b;
     fpublishers.push_back(new TPubBattery("/battery"));
     fpublishers.push_back(new TPubExtractorFanRpm("/extractor_fan_rpm"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Extractor fan RPM")
+      ->setADIcon("mdi:fan-speed-3")
+      ->setADUnit("RPM")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TMqttPublisherBase("/current_error_hydronic"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Current error hydronic")
+      ->setADIcon("mdi:alert-octagon")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubPumpSafetySwitch("/pump_safety_switch"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Pump safety switch")
+      ->setADIcon("mdi:toggle-switch")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TMqttPublisherBase("/circ_air_motor_setpoint"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Air circulation setpoint")
+      ->setADIcon("mdi:fan")
+      ->setADUnit("%")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubCircAirMotorCurrent("/circ_air_motor_current"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Air circulation current")
+      ->setADIcon("mdi:current-ac")
+      ->setADDevice_class("current")
+      ->setADUnit("A")
+      ->setADSuggested_display_precision(1)
+      ->setADEntity_category("diagnostic");
+
 }
 
 void TFrame3b::publishFrameData()
@@ -420,7 +567,17 @@ TOnOff::TOnOff():TMasterFrame(0x01, 0x04, 0xb8)
     fdata[3]=0x10;
     fdata[4]=0x03;
     fpublishers.push_back(new TMqttPublisherBase("/requested_state"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Requested state")
+      ->setADIcon("mdi:sync-circle")
+      ->setADEntity_category("diagnostic")
+      ->setADValue_template("{% set mapper = {0:\"no tin\", 1:\"idle\", 2:\"on\", 3:\"shutdown\", 4:\"powering up\"} %}{{ mapper.get(value | int, \"unknown\") }} ({{ value }})");
     fpublishers.push_back(new TMqttPublisherBase("/current_state"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Current state")
+      ->setADIcon("mdi:sync-circle")
+      ->setADEntity_category("diagnostic")
+      ->setADValue_template("{% set mapper = {0:\"no tin\", 1:\"idle\", 2:\"on\", 3:\"shutdown\", 4:\"powering up\"} %}{{ mapper.get(value | int, \"unknown\") }} ({{ value }})");
     SetOn(false);
 }
 
@@ -445,7 +602,14 @@ TGetErrorInfo::TGetErrorInfo():TMasterFrame(0x01, 0x06, 0xb2)
     fdata[6]=0x10;
     fdata[7]=0x03;
     fpublishers.push_back(new TMqttPublisherBase("/err_class"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Error class")
+      ->setADIcon("mdi:alert-circle-outline")
+      ->setADValue_template("{% set val = value | int %}{% if val == 0 %}no error{% elif val in [1, 2] %}warning{% elif val in [10, 20, 30] %}error{% elif val == 40 %}locked{% else %}unknown{% endif %} ({{ val }})");
     fpublishers.push_back(new TMqttPublisherBase("/err_code"));
+    fpublishers.back()->setADComponent(CKSensor)
+      ->setADName("Error code")
+      ->setADIcon("mdi:numeric");
     fpublishers.push_back(new TMqttPublisherBase("/err_short"));
 }
 

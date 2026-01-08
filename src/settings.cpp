@@ -4,8 +4,9 @@
 #include <ArduinoJson.h>
 #endif
 
-String BoilerMode[] = {"off","eco","high","boost"};
+std::vector<String> BoilerMode = {"off","eco","high","boost"};
 double BoilerTemp[] = {0.0, 40.0, 55.0, 60.0}; 
+std::vector<String> FanModes = {"eco","high","off","1","2","3","4","5","6","7","8","9","10"};
 
 void TMqttSetting::PublishValue(bool local)
 {
@@ -71,6 +72,7 @@ TMqttSetting::TMqttSetting(String topic, SettingKind kind)
 {
     ftopic=topic;
     fkind=kind;
+    setADTopic(topic);
 }
 
 bool TMqttSetting::MqttMessage(String topic, String payload, boolean local)
@@ -120,9 +122,17 @@ void TMqttSetting::setValue(String newvalue, bool local)
     PublishValue(local);
 }
 
+TBoilerSetting::TBoilerSetting(String topic) : TMqttSetting(topic, SKString) {
+    setValue("off");
+    setADComponent(CKSelect);
+    setADName("Water mode");
+    setADIcon("mdi:water-boiler");
+    setADOptions(&BoilerMode);
+};
+
 bool TBoilerSetting::Validate(String newvalue)
 {
-    for (int i=0; i<std::extent<decltype(BoilerMode)>::value; i++ ) {
+    for (int i=0; i<BoilerMode.size(); i++ ) {
         if (newvalue==BoilerMode[i]) {
             setValue(BoilerTemp[i],false);
             return TMqttSetting::Validate(newvalue);
@@ -133,6 +143,14 @@ bool TBoilerSetting::Validate(String newvalue)
     Serial.println(ftopic);
     return false;
 }
+
+TFanSetting::TFanSetting(String topic) : TMqttSetting(topic, SKString){
+    setValue("off");
+    setADComponent(CKSelect);
+    setADName("Fan mode");
+    setADIcon("mdi:fan");
+    setADOptions(&FanModes);
+};
 
 bool TFanSetting::Validate(String newvalue)
 {
@@ -159,6 +177,11 @@ bool TFanSetting::Validate(String newvalue)
     return false;
 }
 
+TOnOffSetting::TOnOffSetting(String topic) : TMqttSetting(topic, SKString){
+    setValue(0);
+    setADComponent(CKSwitch);
+};
+
 bool TOnOffSetting::Validate(String newvalue)
 {
     int num=atoi(newvalue.c_str());
@@ -171,6 +194,19 @@ bool TOnOffSetting::Validate(String newvalue)
     Serial.println(ftopic);
     return false;
 }
+
+TTempSetting::TTempSetting(String topic, double minvalue, double maxvalue) : TMqttSetting(topic, SKFloat) {
+    fminvalue=minvalue;
+    fmaxvalue=maxvalue;
+    setValue(fminvalue);
+    setADComponent(CKNumber);
+    setADIcon("mdi:thermometer");
+    setADUnit("°C");
+    setADMin(minvalue);
+    setADMax(maxvalue);
+    setADMode("box");
+    setADSuggested_display_precision(1);
+};
 
 bool TTempSetting::Validate(double newvalue)
 {

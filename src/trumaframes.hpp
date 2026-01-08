@@ -6,6 +6,7 @@
 #include <ESP32MQTTClient.h>
 #include <array>
 #include <vector>
+#include "autodiscovery.hpp"
 
 /****************************************************
   Composition of frames read
@@ -140,7 +141,7 @@ struct frameControlElements //only for gas
   converted to the correct endiannes) to a suitable
   representation
 */
-class TMqttPublisherBase {
+class TMqttPublisherBase : public TAutoDiscovery {
   private:
     String ftopic;
     unsigned long flastsent;
@@ -176,7 +177,8 @@ class TFrameBase {
         //and report back to the mqtt broker/websocket clients
         virtual void publishFrameData();
         uint8_t frameid() {return fframeid;};
-        boolean getDataOk() {return fdataok;};          
+        boolean getDataOk() {return fdataok;};
+        void PublishAutoDiscovery();
 };
 
 /* conversion functions */
@@ -203,7 +205,9 @@ protected:
     return String(fvalue);
    };
 public:
-  TPubBool(String topic) : TMqttPublisherBase(topic) {}  
+  TPubBool(String topic) : TMqttPublisherBase(topic) {
+    setADComponent(CKBinary_sensor);
+  }
 };
 
 /* publishes a voltage */
