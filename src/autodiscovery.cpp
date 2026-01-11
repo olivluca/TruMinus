@@ -4,6 +4,8 @@
 
 void TAutoDiscovery::PublishAutoDiscovery()
 {
+    if (FNext) FNext->PublishAutoDiscovery();
+
     if (Fcomponent == CKUndefined || Ftopic == "" || Fname == "") {
         return;
     }
@@ -25,11 +27,11 @@ void TAutoDiscovery::PublishAutoDiscovery()
         case CKButton:
         case CKSwitch:
             topic=BaseTopicSet+"/"+Ftopic;
-            uniq_id="truma_set_"+Ftopic;
+            uniq_id="truma_set_"+Ftopic+FSuffix;
             break;
         default:
             topic=BaseTopicStatus+"/"+Ftopic;
-            uniq_id="truma_st_"+Ftopic;
+            uniq_id="truma_st_"+Ftopic+FSuffix;
     };
 
     // Common fields

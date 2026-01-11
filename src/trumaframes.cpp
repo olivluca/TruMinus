@@ -219,12 +219,19 @@ void TFrameSetTemp::setTemperature(double temp)
 TFrame34::TFrame34() : TFrameBase()
 {
     fframeid=0x34;
+    //operation time both raw and decoded
     fpublishers.push_back(new TPubOperationTime("/operation_time"));
     fpublishers.back()->setADComponent(CKSensor)
       ->setADName("Operation time")
       ->setADIcon("mdi:clock-check")
       ->setADEntity_category("diagnostic")
       ->setADValue_template("{% set total_min = value | int %}{% set days = (total_min // 1440) %}{% set hours = (total_min % 1440) // 60 %}{% set minutes = total_min % 60 %}{{ days }}d {{ hours }}h {{ minutes }}m");
+    fpublishers.back()->addAutoDiscovery("_raw")->setADComponent(CKSensor)
+      ->setADName("Operation time (raw)")
+      ->setADIcon("mdi:clock-outline")
+      ->setADDevice_class("duration")
+      ->setADUnit("min")
+      ->setADEntity_category("diagnostic");
     fpublishers.push_back(new TPubBool("/k1"));
     fpublishers.back()->setADComponent(CKBinary_sensor)
       ->setADName("Relay K1")

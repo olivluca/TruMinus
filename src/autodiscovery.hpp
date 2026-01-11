@@ -37,6 +37,10 @@ class TAutoDiscovery {
 
     // Other flags
     int Fsuggested_display_precision = -1;
+
+    // Next in chain
+    TAutoDiscovery * FNext = nullptr;
+    String FSuffix = "";
   public:
     TAutoDiscovery() {};
     TAutoDiscovery* setADComponent(ComponentKind value) {Fcomponent=value; return this;};
@@ -57,5 +61,6 @@ class TAutoDiscovery {
     TAutoDiscovery* setADSuggested_display_precision(int value) {Fsuggested_display_precision=value; return this;};
     TAutoDiscovery* setADOptions(std::vector<String>* value) {Foptions = value; return this;};
     TAutoDiscovery* setADValue_template(String value) {Fvalue_template=value; return this;};
+    TAutoDiscovery* addAutoDiscovery(String suffix) {FNext = new TAutoDiscovery() ; FNext->Ftopic = Ftopic; FNext->FSuffix=suffix; return FNext;};
     void PublishAutoDiscovery();
 };
