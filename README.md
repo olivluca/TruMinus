@@ -117,3 +117,20 @@ Only one error condition can be shown at a time.
 The companion repository
 [TrumaDisplay](https://github.com/olivluca/TrumaDisplay) implements a simple
 display using the topics made available by this project.
+
+## home assistant integration
+
+The program publishes mqtt auto-discovery topics for easy integration into home assistant.
+You can tweak the topics with the defines in `globals.hpp`
+
+```
+//mqtt autodiscovery parameters
+#define HA_DEVICE_ID "truma_boiler_01"
+#define HA_DEVICE_NAME "Combi D"
+#define HA_DEVICE_MODEL "Combi Heater"
+#define HA_DEVICE_MANUFACTURER "Truma"
+#define HA_DISCOVERY_TOPIC "homeassistant/"
+```
+
+If you don't want to clobber your mqtt broker with these topics, simply remove the `-DAUTODISCOVERY` line from `platformio.ini`.
+
