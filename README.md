@@ -21,6 +21,8 @@ of your mqtt broker, please see the comments in `main.cpp`.
 
 Change the settings in `platformio.ini` to suit your board and your preferences.
 
+The boards I used (for which I provide some defines) are a GOOUUU ESP32 C3 (the one I'm actually using), a Wroom32 based board and a c3 supermini (not field tested but it should work just the same as the GOOUUU).
+
 If you want to use the webserver don't forget to `Build Filesystem Image` and to `Upload Filesystem Image`.
 
 ## connection to the combi
@@ -28,7 +30,7 @@ If you want to use the webserver don't forget to `Build Filesystem Image` and to
 To connect to the combi you can follow the "Hardware requirements" section of the [inetbox.py](https://github.com/danielfett/inetbox.py) project 
 (of course you don't need a cp-plus and instead of connecting the transceiver to the raspberry pi you'll have to connect it to the esp32).
 I used pin 19 for TX (connected to the RX of the transceiver) and pin 18 for RX (connected to the TX of the transceiver) but you can change the pins
-with the defines in `main.cpp`.
+with the defines in `main.cpp` (since the c3 supermini doesn't break out those pin, I defined pin 6 for TX and pin 7 for RX).
 
 Also, since this is the master on the lin-bus, if you use the same [transceiver](https://www.aliexpress.com/item/4001054538389.html) you should bridge the `LIN` and `INH` terminals of the transceiver.
 
