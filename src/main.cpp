@@ -22,18 +22,41 @@
 #include <esp_task_wdt.h>
 
 //adapt these to your board
-#ifdef C3
+//either use one of the presets or define
+//your own led, tx and rx pin.
+//if you define LED and RED_LED  the
+//RED_LED will be used for errors and
+//LED for ok, otherwise the same LED
+//will be used for both error and ok
+#ifdef GOOUUUC3
+//this board has an RGB led, each color is on when the output is HIGH
 #define RED_LED 3
 #define LED 4
 #define LED_ON LOW
 #define LED_OFF HIGH
-#else
+#define TX_PIN 19
+#define RX_PIN 18
+#endif
+#ifdef WROOM32
+//this board has a single led, on when the output is HIGH
 #define LED 2
 #define LED_ON HIGH
 #define LED_OFF LOW
-#endif
 #define TX_PIN 19
 #define RX_PIN 18
+#endif
+#ifdef C3SUPERMINI
+//this board has a single led, on when the output is LOW
+#define LED 8
+#define LED_ON LOW
+#define LED_OFF HIGH
+#define TX_PIN 6
+#define RX_PIN 7
+#endif
+#ifndef TX_PIN
+#error Please define GOOUUUC3, C3SUPERMINI, WROOM32 or your custom LED/TX_PIN/RX_PIN
+//#include <stop>
+#endif
 
 //Lin master
 Lin_Interface LinBus(1); 
